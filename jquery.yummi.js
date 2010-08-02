@@ -14,7 +14,7 @@
       }
     }
     return string.join('');
-  }
+  };
   
   $.fn.caretPos = function() {
     var pos;
@@ -26,7 +26,7 @@
       pos = this.get(0).selectionStart;
     }
     return pos;
-  }
+  };
   
   $.fn.wordAtCaret = function() {
     var value = this.val();
@@ -34,7 +34,7 @@
     var forward = value.substrUntil(index, ' ');
     var backward = value.substrUntil(index, ' ', true);
     return backward + forward;
-  }
+  };
   
   // http://stackoverflow.com/questions/499126/jquery-set-cursor-position-in-text-area
   $.fn.setCursorPosition = function(pos) {
@@ -47,7 +47,7 @@
       range.moveStart('character', pos);
       range.select();
     }
-  }
+  };
   
   $.yummi = function(element, options) {
     var element = $(element);
@@ -93,7 +93,7 @@
           if (focused().length) {
             add(focused().text());
             hideResults();
-            clearFocus()
+            clearFocus();
           }
           return false;
         case KEY.ESC:
@@ -111,25 +111,29 @@
           break; // do nothing
         default:
           clearTimeout(timeout);
-          timeout = setTimeout(function() { suggestFor(element.wordAtCaret()) }, 100);
+          timeout = setTimeout(function() { suggestFor(element.wordAtCaret()); }, 100);
           break;
       }
-    }
+    };
     
     function suggestFor(text) {
       if (text == '' || text == undefined) return false;
       if (results.find('> div').length) results.find('> div').remove();
       var regex = new RegExp('^' + text, 'ig');
-      var matches = $.grep(element.data('yummi.collection'), function(entry) { return regex.test(entry) })
+      var matches = $.grep(element.data('yummi.collection'), function(entry) { return regex.test(entry); });
       if (matches.length) { // results found
         if (results.find('.result').length) results.find('.result').remove();
         $.each(matches, function(index, match) {
           var result = $('<div class="result">' + match + '</div>');
           result
-            .mouseover(function() { setFocus(this) })
-            .click(function() { add($(this).text()) });
+            .mouseover(function() {
+              setFocus(this); 
+            })
+            .click(function() {
+              add($(this).text()); 
+            });
           results.append(result);
-        })
+        });
       } else {
         results.append('<div class="no_results">No matches found</div>');
       }
@@ -138,30 +142,30 @@
     
     function showResults() {
       if (!focused().length) setFocus(results.find('.result:first'));
-      results.show() 
+      results.fadeIn('fast');
     }
-    function hideResults() { results.hide() }
-    function clearFocus() { results.find('.focused').removeClass('focused') }
-    function focused() { return results.find('.focused') }
-    function autoCompleting() { return results.is(':visible') }
+    function hideResults() { results.fadeOut('fast'); }
+    function clearFocus() { results.find('.focused').removeClass('focused'); }
+    function focused() { return results.find('.focused'); }
+    function autoCompleting() { return results.is(':visible'); }
     
     function setFocus(result) { 
       if (focused().length) clearFocus();
-      $(result).addClass('focused')
+      $(result).addClass('focused');
     }
     
     function stepUp() {      
       if (!focused().prev().length) return false;
-      setFocus(focused().prev('.result'))
+      setFocus(focused().prev('.result'));
     }
     
     function stepDown() {
       if (!focused().length) {
-        setFocus(results.find('.result:first'))
+        setFocus(results.find('.result:first'));
       } else if (!focused().next().length) {
-        return false
+        return false;
       } else {
-        setFocus(focused().next())
+        setFocus(focused().next());
       }
     }
     
@@ -186,17 +190,17 @@
         + element.padding().bottom  
         + element.border().top
         + element.border().bottom;
-      results.margin({top: marginTop - 1}) // -1 so it appears slightly attached to the text field
+      results.margin({top: marginTop - 1}); // -1 so it appears slightly attached to the text field
     }
         
     insertACResultsList();
     element
       .keydown(keyDownHandler)
-      .blur(function() { hideResults(); clearFocus() })
+      .blur(function() { hideResults(); clearFocus(); })
       .attr('autocomplete', 'off')
       .data('yummi.active', true);
-  }
+  };
     
-  $.fn.yummi = function(options) { return this.each(function() { $.yummi(this, options) }) }
+  $.fn.yummi = function(options) { return this.each(function() { $.yummi(this, options); }); };
   
 })(jQuery);
