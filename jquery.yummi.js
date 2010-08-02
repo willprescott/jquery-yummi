@@ -1,10 +1,16 @@
 (function($) {
+  
   String.prototype.substrUntil = function(index, until, backwards) {
-    var string = [];
-    var regex = new RegExp(until, 'ig');
-    if (backwards) index--; // reverse the caret direction, pretty much
+    var string = [],
+        regex = new RegExp(until, 'ig');
+    if (backwards) {
+      // reverse the caret direction, pretty much
+      index--; 
+    }
     while(this.charAt(index)) {
-      if (regex.test(this.charAt(index))) break;
+      if (regex.test(this.charAt(index))) {
+        break;
+      }
       if (backwards) {
         string.unshift(this.charAt(index));
         index--;
@@ -17,31 +23,34 @@
   };
   
   $.fn.caretPos = function() {
-    var pos;
+    var el = this.get(0),
+        pos, sel;
     if (document.selection) {
-      var sel = document.selection.createRange().duplicate();
-      sel.moveEnd('character', this.get(0).value.length);
-      pos = this.get(0).value.lastIndexOf(sel.text);
+      sel = document.selection.createRange().duplicate();
+      sel.moveEnd('character', el.value.length);
+      pos = el.value.lastIndexOf(sel.text);
     } else {
-      pos = this.get(0).selectionStart;
+      pos = el.selectionStart;
     }
     return pos;
   };
   
   $.fn.wordAtCaret = function() {
-    var value = this.val();
-    var index = this.caretPos();
-    var forward = value.substrUntil(index, ' ');
-    var backward = value.substrUntil(index, ' ', true);
+    var value = this.val(),
+        index = this.caretPos(),
+        forward = value.substrUntil(index, ' '),
+        backward = value.substrUntil(index, ' ', true);
     return backward + forward;
   };
   
   // http://stackoverflow.com/questions/499126/jquery-set-cursor-position-in-text-area
   $.fn.setCursorPosition = function(pos) {
-    if ($(this).get(0).setSelectionRange) {
-      $(this).get(0).setSelectionRange(pos, pos);
-    } else if ($(this).get(0).createTextRange) {
-      var range = $(this).get(0).createTextRange();
+    var el = $(this),
+        range;
+    if ($.isFunction(el.get(0).setSelectionRange)) {
+      el.get(0).setSelectionRange(pos, pos);
+    } else if ($.isFunction(el.get(0).createTextRange)) {
+      range = el.get(0).createTextRange();
       range.collapse(true);
       range.moveEnd('character', pos);
       range.moveStart('character', pos);
@@ -50,12 +59,15 @@
   };
   
   $.yummi = function(element, options) {
-    var element = $(element);
-    var results, timeout;
-    var defaults = {collection: ['apple', 'carrot', 'banana', 'lemon', 'melon', 'onion', 'beetroot', 'orange']};
-    var options = $.extend(defaults, options);
+    var element = $(element),
+        defaults = {collection: ['apple', 'carrot', 'banana', 'lemon', 'melon', 'onion', 'beetroot', 'orange']},
+        options = $.extend(defaults, options),
+        results, timeout;
     element.data('yummi.collection', (options.collection || defaults.collection));
-    if (element.data('yummi.active')) return false; // let the collection be updated and bail out
+    if (element.data('yummi.active')) {
+      // let the collection be updated and bail out
+      return false;
+    }
     
     // Private
     var KEY = { 
@@ -89,13 +101,16 @@
           break;
         case KEY.RETURN:
           event.preventDefault();
-          if (element.val() == "") element.parents('form').trigger('submit');
+          if (element.val() === "") {
+            element.parents('form').trigger('submit');
+          }
           if (focused().length) {
             add(focused().text());
             hideResults();
             clearFocus();
           }
           return false;
+          break;
         case KEY.ESC:
           hideResults();
           clearFocus();
@@ -111,18 +126,29 @@
           break; // do nothing
         default:
           clearTimeout(timeout);
-          timeout = setTimeout(function() { suggestFor(element.wordAtCaret()); }, 100);
+          timeout = setTimeout(function() { 
+            suggestFor(element.wordAtCaret()); 
+          }, 100);
           break;
       }
     };
     
     function suggestFor(text) {
-      if (text == '' || text == undefined) return false;
-      if (results.find('> div').length) results.find('> div').remove();
-      var regex = new RegExp('^' + text, 'ig');
-      var matches = $.grep(element.data('yummi.collection'), function(entry) { return regex.test(entry); });
+      var regex, matches;
+      if (text === '' || text === undefined) {
+        return false;
+      }
+      if (results.find('> div').length) {
+        results.find('> div').remove();
+      }
+      regex = new RegExp('^' + text, 'ig');
+      matches = $.grep(element.data('yummi.collection'), function(entry) { 
+                  return regex.test(entry); 
+                });
       if (matches.length) { // results found
-        if (results.find('.result').length) results.find('.result').remove();
+        if (results.find('.result').length) {
+          results.find('.result').remove();
+        }
         $.each(matches, function(index, match) {
           var result = $('<div class="result">' + match + '</div>');
           result
@@ -141,21 +167,39 @@
     }
     
     function showResults() {
-      if (!focused().length) setFocus(results.find('.result:first'));
+      if (!focused().length) {
+        setFocus(results.find('.result:first'));
+      }
       results.fadeIn('fast');
     }
-    function hideResults() { results.fadeOut('fast'); }
-    function clearFocus() { results.find('.focused').removeClass('focused'); }
-    function focused() { return results.find('.focused'); }
-    function autoCompleting() { return results.is(':visible'); }
+    
+    function hideResults() { 
+      results.fadeOut('fast'); 
+    }
+    
+    function clearFocus() { 
+      results.find('.focused').removeClass('focused'); 
+    }
+    
+    function focused() { 
+      return results.find('.focused'); 
+    }
+    
+    function autoCompleting() { 
+      return results.is(':visible'); 
+    }
     
     function setFocus(result) { 
-      if (focused().length) clearFocus();
+      if (focused().length) {
+        clearFocus();
+      }
       $(result).addClass('focused');
     }
     
     function stepUp() {      
-      if (!focused().prev().length) return false;
+      if (!focused().prev().length) {
+        return false;
+      }
       setFocus(focused().prev('.result'));
     }
     
@@ -170,8 +214,8 @@
     }
     
     function add(result) {
-      var value = element.val();
-      var position = getCaretWordIndex();
+      var value = element.val(),
+          position = getCaretWordIndex();
       value = value.substr(0, position) + result + value.substr(position + element.wordAtCaret().length);
       element.val(value);
       element.setCursorPosition(value.length);
@@ -182,9 +226,10 @@
     }
 
     function insertACResultsList() {
+      var marginTop;
       element.before('<div class="yummi-results"></div>');
       results = element.prev('.yummi-results');
-      var marginTop = element.height() 
+      marginTop = element.height() 
         + element.margin().top
         + element.padding().top 
         + element.padding().bottom  
@@ -196,11 +241,17 @@
     insertACResultsList();
     element
       .keydown(keyDownHandler)
-      .blur(function() { hideResults(); clearFocus(); })
+      .blur(function() { 
+        hideResults(); clearFocus(); 
+      })
       .attr('autocomplete', 'off')
       .data('yummi.active', true);
   };
     
-  $.fn.yummi = function(options) { return this.each(function() { $.yummi(this, options); }); };
+  $.fn.yummi = function(options) { 
+    return this.each(function() { 
+      $.yummi(this, options); 
+    }); 
+  };
   
 })(jQuery);
