@@ -229,13 +229,9 @@
       var marginTop;
       element.before('<div class="yummi-results"></div>');
       results = element.prev('.yummi-results');
-      marginTop = element.height() 
-        + element.margin().top
-        + element.padding().top 
-        + element.padding().bottom  
-        + element.border().top
-        + element.border().bottom;
-      results.margin({top: marginTop - 1}); // -1 so it appears slightly attached to the text field
+      marginTop = parseInt(element.outerHeight(true)
+          - parseFloat(element.css('margin-bottom')) - 1); // -1 so it appears slightly attached to the text field
+      results.css('margin-top', marginTop);
     }
         
     insertACResultsList();
