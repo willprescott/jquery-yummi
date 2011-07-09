@@ -80,14 +80,15 @@
 
   /**
      * @param {String} element
+     * @param {Array} data
      * @param {Object} opts
      */
-  $.yummi = function(element, opts) {
+  $.yummi = function(element, data, opts) {
     var $element = $(element), $results,
-        defaults = {collection: ['apple', 'carrot', 'banana', 'lemon', 'melon', 'onion', 'beetroot', 'orange']},
+        defaults = {},
         options = $.extend(defaults, opts),
         timeout;
-    $element.data('yummi.collection', (options.collection || defaults.collection));
+    $element.data('yummi.collection', data);
     if ($element.data('yummi.active')) {
       // let the collection be updated and bail out
       return false;
@@ -268,9 +269,24 @@
         .data('yummi.active', true);
   };
 
-  $.fn.yummi = function(opts) {
+  /**
+     * Initialise the Yummi autosuggest widget.
+     *
+     * @param {Object|Array} data Data should now be an array, but the legacy object type with a 'collection' key is still supported
+     * @param {Object} opts An optional set of user preferences to override defaults
+     */
+  $.fn.yummi = function(data, opts) {
+    // data collection is now explicitly required
+    if (!data) {
+      if (window.console && typeof window.console.error == 'function') {
+          console.error('Yummi must be initialised with a data collection');
+      }
+      return;
+    }
+    // maintain compatibility with previous {collection: [data]} style data model
+    var collection = typeof data === 'object' && !(data instanceof Array) && data.collection ? data.collection : data;
     return this.each(function() {
-      $.yummi(this, opts);
+      $.yummi(this, collection, opts);
     });
   };
 
