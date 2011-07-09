@@ -84,8 +84,11 @@
      * @param {Object} opts
      */
   $.yummi = function(element, data, opts) {
-    var $element = $(element), $results,
-        defaults = {},
+    var $element = $(element), $results, $sizer,
+        defaults = {
+          noResultsMessage: 'No matches found',
+          separator: ' '
+        },
         options = $.extend(defaults, opts),
         timeout;
     $element.data('yummi.collection', data);
@@ -118,7 +121,7 @@
           break;
         case KEY.TAB:
           if (focused().length) {
-            add(focused().text());
+            focused().click();
             hideResults();
             clearFocus();
             event.preventDefault();
@@ -130,7 +133,7 @@
             $element.parents('form').trigger('submit');
           }
           if (focused().length) {
-            add(focused().text());
+            focused().click();
             hideResults();
             clearFocus();
           }
@@ -185,8 +188,11 @@
               });
           $results.append($result);
         });
+      } else if (options.noResultsMessage) {
+        $results.append('<div class="no_results">' + options.noResultsMessage + '</div>');
       } else {
-        $results.append('<div class="no_results">No matches found</div>');
+        hideResults();
+        return;
       }
       showResults();
     }
@@ -194,6 +200,17 @@
     function showResults() {
       if (!focused().length) {
         setFocus($results.find('.result:first'));
+      }
+      var prevText = $element.val().substring(0, $element.caretPos() - 1);
+      $sizer.text(prevText);
+      var textWidth = $sizer.outerWidth(true),
+          resultsWidth = $results.outerWidth(true),
+          elmWidth = $element.outerWidth(true),
+          elmLeft = $element.offset().left;
+      if ((textWidth + resultsWidth) > elmWidth) {
+        $results.css("left", elmLeft + elmWidth - resultsWidth);
+      } else {
+        $results.css("left", elmLeft + textWidth);
       }
       $results.fadeIn('fast');
     }
@@ -241,8 +258,8 @@
       var value = $element.val(),
           position = getCaretWordIndex();
       value = value.substr(0, position) + result + value.substr(position + $element.wordAtCaret().length);
-      $element.val(value);
-      $element.setCursorPosition(value.length);
+      $element.val(value + options.separator);
+      $element.setCursorPosition(value.length + options.separator.length);
     }
 
     function getCaretWordIndex() {
@@ -251,11 +268,23 @@
 
     function insertACResultsList() {
       var marginTop;
-      $element.before('<div class="yummi-results"></div>');
+      $element.before('<span class="yummi-sizer"></span>'
+          + '<div class="yummi-results"></div>');
       $results = $element.prev('.yummi-results');
+      $sizer = $results.prev('.yummi-sizer');
       marginTop = parseInt($element.outerHeight(true)
           - parseFloat($element.css('margin-bottom')) - 1); // -1 so it appears slightly attached to the text field
       $results.css('margin-top', marginTop);
+      // sizer element used only to calculate width of existing tags, properties need to match text input closely
+      $sizer.css({
+        'position': 'absolute',
+        'left': '-9999px',
+        'marginLeft': $element.css('marginLeft'),
+        'borderLeftWidth': $element.css('borderLeftWidth'),
+        'paddingLeft': $element.css('paddingLeft'),
+        'fontFamily': $element.css('fontFamily'),
+        'fontSize': $element.css('fontSize')
+      });
     }
 
     insertACResultsList();
@@ -270,7 +299,10 @@
   };
 
   /**
-     * Initialise the Yummi autosuggest widget.
+     * Initialise the Yummi autosuggest widget. Available option keys are:
+     *
+     *    noResultsMessage: {String|null} Pass your own string to localise message, null for no message at all, default: 'No matches found'
+     *    separator: {String} A string to insert after each autocompleted word (e.g. a space or comma). Default: '' (empty string)
      *
      * @param {Object|Array} data Data should now be an array, but the legacy object type with a 'collection' key is still supported
      * @param {Object} opts An optional set of user preferences to override defaults

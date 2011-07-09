@@ -3,12 +3,13 @@
 .yummi-results          {
   position: absolute;
   display: none;
-  width: 16em; 
   border: 1px solid #999; 
   background-color: #000;
   opacity: 0.85;
   font-size: 14px;
+  z-index: 10001;
 }
 .yummi-results > div        { display: block; padding: 3px; color: #fff }
+.yummi-results > div:hover  { cursor: pointer }
 .yummi-results .no_results  { font-style: italic }
 .yummi-results .focused     { font-weight: bold; opacity: 1 }

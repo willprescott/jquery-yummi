@@ -31,16 +31,18 @@ a:hover { text-decoration: underline }
 }
 #logo .faded { color: #999 }
 
-h1    { size: 2em; font-weight: bold; margin-bottom: 2em }
-h2    { size: 1.8em; font-weight: bold; margin: 0.5em 0 }
-p, ul { font-size: 1.3em }
+h1    { font-size: 2em; font-weight: bold; margin-bottom: 2em }
+h2    { font-size: 1.6em; font-weight: bold; margin: 0.5em 0 }
+p, ul, dd, label { font-size: 1.3em }
 p     { margin: 0.4em 0 }
 ul    { list-style-type: disc; line-height: 1.6em; }
 li    { margin-left: 16px }
-code  { display: block; font-size: 1.6em; margin: 1.5em 0 }
+code  { font-size: 1.6em; margin: 1.5em 0 }
+dt    { font-size: 1.4em; font-weight: bold; margin: 0.5em 0 0 1em }
+dd    { margin: 0 0 0 2em }
 
-form,
-input { font-size: 1.3em } 
+
+input { font-size: 1.3em }
 
 form    { width: 60%; margin: 1em 0 }
 label   { display: block; font-weight: bold }
