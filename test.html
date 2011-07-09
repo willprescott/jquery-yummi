@@ -10,9 +10,19 @@
     <script type="text/javascript" charset="utf-8">
       $(document).ready(function() {
         $('#fruits').yummi(['apple', 'carrot', 'banana', 'lemon', 'melon', 'onion', 'beetroot', 'orange']);
-        $('#fruits2').yummi(['apple', 'carrot', 'banana', 'lemon', 'melon', 'onion', 'beetroot', 'orange'], {
+        $('#fruits2').yummi([
+          ['apple', 10],
+          ['carrot', 15],
+          ['banana', 20],
+          ['lemon', 25],
+          ['melon', 30],
+          ['onion', 35],
+          ['beetroot', 40],
+          ['orange', 45]
+        ], {
             'noResultsMessage': 'No fruit for YOU!',
-            'separator': ', '
+            'separator': ', ',
+            'showTermCounts': true
         });
       })
     </script>
@@ -75,12 +85,27 @@
         <dt>separator</dt>
         <dd>Specify a string to be automatically added to a word when autocompleted, useful for tagging systems
         requiring tags to be separated by a comma or semi-colon for example. Default value: " " (single space).</dd>
+        <dt>showTermCounts</dt>
+        <dd>Show number of occurences for a term. If your data happens to include a count of the number of
+        instances for each suggestion, you can set this option to <code>true</code> for that authentic Delicious
+        effect! To use this option, the data you pass in must be an array holding both the terms and their counts, as
+        in the example below. Default value: false.</dd>
       </dl>
       <p>For example:</p>
       <pre><code>
-        $('form :text:first').yummi(['keywords', 'for', 'auto', 'completion'], {
+        $('form :text:first').yummi([
+            ['apple', 10],
+            ['carrot', 15],
+            ['banana', 20],
+            ['lemon', 25],
+            ['melon', 30],
+            ['onion', 35],
+            ['beetroot', 40],
+            ['orange', 45]
+          ], {
             'noResultsMessage': 'No fruit for YOU!',
-            'separator': ', '
+            'separator': ', ',
+            'showTermCounts': true
         });
       </code></pre>
       <p>Produces:</p>

@@ -87,7 +87,8 @@
     var $element = $(element), $results, $sizer,
         defaults = {
           noResultsMessage: 'No matches found',
-          separator: ' '
+          separator: ' ',
+          showTermCounts: false
         },
         options = $.extend(defaults, opts),
         timeout;
@@ -171,20 +172,22 @@
       }
       regex = new RegExp('^' + text, 'ig');
       matches = $.grep($element.data('yummi.collection'), function(entry) {
-        return regex.test(entry);
+        return regex.test(entry.length === 1 ? entry : entry[0]);
       });
       if (matches.length) { // results found
         if ($results.find('.result').length) {
           $results.find('.result').remove();
         }
         $.each(matches, function(index, match) {
-          var $result = $('<div class="result">' + match + '</div>');
+          var term = match instanceof Array ? match[0] : match,
+              text = options.showTermCounts && match instanceof Array ? term + ' (' + match[1] + ')' : term,
+              $result = $('<div class="result">' + text + '</div>');
           $result
               .mouseover(function() {
                 setFocus(this);
               })
               .click(function() {
-                add($(this).text());
+              add(term);
               });
           $results.append($result);
         });
@@ -303,6 +306,11 @@
      *
      *    noResultsMessage: {String|null} Pass your own string to localise message, null for no message at all, default: 'No matches found'
      *    separator: {String} A string to insert after each autocompleted word (e.g. a space or comma). Default: '' (empty string)
+     *    showTermCounts: {Boolean} Set to true if your data contains a count of number of word occurences. Default: false
+     *
+     *  If showTermCounts is true your data must be an array of arrays in the following form:
+     *
+     *      [['term1',10],['term2',15],['term3', 20]] // first element of each array is the term, second is the frequency count
      *
      * @param {Object|Array} data Data should now be an array, but the legacy object type with a 'collection' key is still supported
      * @param {Object} opts An optional set of user preferences to override defaults
